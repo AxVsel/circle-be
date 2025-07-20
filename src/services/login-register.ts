@@ -6,7 +6,9 @@ export async function registerUser(
   username: string,
   full_name: string,
   email: string,
-  password: string
+  password: string,
+  photo_profile: string,
+  background: string
 ) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email) || password.length < 6) {
@@ -30,27 +32,44 @@ export async function registerUser(
       full_name,
       email,
       password: hashedPassword,
+      photo_profile,
+      background,
     },
   });
 
   const token = signToken({ id: user.id });
-  return {
-    user,
-    token,
-  };
+  return { user, token };
 }
 
 export async function loginUser(identifier: string, password: string) {
-  const user = await prisma.user.findFirst({
-    where: {
-      OR: [{ email: identifier }, { username: identifier }],
-    },
-  });
+  try {
+    console.log("📥 Input:", identifier, password);
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { username: identifier }],
+      },
+    });
 
-  if (!user) return null;
+    if (!user) {
+      console.log("❌ User not found");
+      return null;
+    }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) return null;
+    console.log("✅ User found:", user);
 
-  return user;
+    if (!user?.password) {
+      console.log("❌ Password null");
+      return null;
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log("🔐 Password valid?", isPasswordValid);
+
+    if (!isPasswordValid) return null;
+
+    return user;
+  } catch (error) {
+    console.error("❌ Error in loginUser:", error);
+    throw error;
+  }
 }

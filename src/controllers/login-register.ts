@@ -13,19 +13,27 @@ export async function handleRegister(req: Request, res: Response) {
         message: error.message,
       });
     }
+
     const { username, full_name, email, password } = req.body;
+
+    const photo_profile = `https://api.dicebear.com/9.x/adventurer/svg?seed=${full_name}`;
+    const background = `https://api.dicebear.com/9.x/glass/svg?seed=${username}`;
+
     const { user, token } = await registerUser(
       username,
       full_name,
       email,
-      password
+      password,
+      photo_profile,
+      background
     );
+
     return res.status(200).json({
       code: 200,
       status: "success",
       message: "Registrasi berhasil. Akun berhasil dibuat.",
       data: {
-        user_id: user.id.toString(),
+        user_id: user.id,
         username: user.username,
         name: user.full_name,
         email: user.email,
@@ -37,7 +45,7 @@ export async function handleRegister(req: Request, res: Response) {
     return res.status(500).json({
       code: 500,
       status: "error",
-      message: "Terjadi kesalahan pada server",
+      message: err.message || "Terjadi kesalahan pada server",
     });
   }
 }
@@ -55,8 +63,12 @@ export async function handleLogin(req: Request, res: Response) {
       });
     }
 
-    const token = signToken({
-      id: user.id,
+    const token = signToken({ id: user.id });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "lax",
     });
 
     return res.status(200).json({
@@ -64,7 +76,7 @@ export async function handleLogin(req: Request, res: Response) {
       status: "success",
       message: "Login successful.",
       data: {
-        user_id: user.id.toString(),
+        user_id: user.id,
         username: user.username,
         name: user.full_name,
         email: user.email,
@@ -80,4 +92,18 @@ export async function handleLogin(req: Request, res: Response) {
       message: "Terjadi kesalahan pada server.",
     });
   }
+}
+
+export async function handleLogout(req: Request, res: Response) {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
+  return res.status(200).json({
+    code: 200,
+    status: "success",
+    message: "Logout berhasil. Token telah dihapus.",
+  });
 }

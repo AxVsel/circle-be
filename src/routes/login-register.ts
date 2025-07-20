@@ -1,8 +1,13 @@
 import express from "express";
-import { handleRegister, handleLogin } from "../controllers/login-register";
+import {
+  handleRegister,
+  handleLogin,
+  handleLogout,
+} from "../controllers/login-register";
 const router = express.Router();
 
 router.post("/register", handleRegister);
-router.get("/login", handleLogin);
+router.post("/login", handleLogin);
+router.post("/logout", handleLogout);
 
 export default router;
