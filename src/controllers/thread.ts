@@ -16,7 +16,6 @@ export async function handleCreateThread(req: Request, res: Response) {
       image: imagePath,
       userId: user.id,
     });
-
     const threadWithUser = await prisma.thread.findFirst({
       where: { id: newThread.id },
       include: {
