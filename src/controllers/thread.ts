@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createThread, getAllThreads } from "../services/thread";
+import { prisma } from "../prisma/client";
 
 export async function handleCreateThread(req: Request, res: Response) {
   try {
@@ -9,26 +10,48 @@ export async function handleCreateThread(req: Request, res: Response) {
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
     const imagePath = req.file?.filename;
-
     const newThread = await createThread({
       content,
       image: imagePath,
       userId: user.id,
     });
 
+    const threadWithUser = await prisma.thread.findFirst({
+      where: { id: newThread.id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            full_name: true,
+            username: true,
+            photo_profile: true,
+          },
+        },
+      },
+    });
+
+    const io = req.app.locals.io;
+    io.emit("new-thread", {
+      id: threadWithUser?.id,
+      user_id: threadWithUser?.id,
+      content: threadWithUser?.content,
+      image_url: threadWithUser?.image,
+      timestamp: threadWithUser?.created_at,
+      user: threadWithUser?.user, // << penting
+    });
     return res.status(201).json({
       code: 200,
       status: "success",
       message: "Thread berhasil diposting.",
       data: {
         tweet: {
-          id: newThread.id,
-          user_id: newThread.userId,
-          content: newThread.content,
-          image_url: newThread.image,
-          timestamp: newThread.created_at,
+          id: threadWithUser?.id,
+          user_id: threadWithUser?.id,
+          content: threadWithUser?.content,
+          image_url: threadWithUser?.image,
+          timestamp: threadWithUser?.created_at,
+          user: threadWithUser?.user,
         },
       },
     });
@@ -55,6 +78,12 @@ export async function handleGetAllThreads(req: Request, res: Response) {
         content: thread.content,
         image_url: thread.image ?? null,
         timestamp: thread.created_at,
+        user: {
+          id: thread.user.id,
+          username: thread.user.username,
+          full_name: thread.user.full_name,
+          photo_profile: thread.user.photo_profile,
+        },
       };
     });
 
