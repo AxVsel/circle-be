@@ -25,17 +25,6 @@ model User {
   bio           String?
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
-  created_by    Int?
-  updated_by    Int?
-
-  createdThreads Thread[] @relation("CreatedThreads")
-  updatedThreads Thread[] @relation("UpdatedThreads")
-
-  createdReplies Reply[] @relation("CreatedReplies")
-  updatedReplies Reply[] @relation("UpdatedReplies")
-
-  createdLikes Like[] @relation("CreatedLikes")
-  updatedLikes Like[] @relation("UpdatedLikes")
 
   following Following[] @relation("FollowingUser")
   followers Following[] @relation("FollowerUser")
@@ -43,25 +32,22 @@ model User {
   replies Reply[]
   threads Thread[]
   likes   Like[]
+  rchild  Rchild[]
 }
 
 model Thread {
   id                Int      @id @default(autoincrement())
   content           String
   image             String?
-  number_of_replies Int?
+  number_of_replies Int      @default(0)
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
-  created_by        Int?
-  updated_by        Int?
-
-  user          User? @relation(fields: [created_by], references: [id], name: "CreatedThreads")
-  updatedByUser User? @relation(fields: [updated_by], references: [id], name: "UpdatedThreads")
 
   replies Reply[]
   likes   Like[]
   userId  Int?
-  User    User?   @relation(fields: [userId], references: [id])
+  user    User?    @relation(fields: [userId], references: [id])
+  rchild  Rchild[]
 }
 
 model Reply {
@@ -72,28 +58,38 @@ model Reply {
   content    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  created_by Int?
-  updated_by Int?
 
-  user      User   @relation(fields: [user_id], references: [id])
-  thread    Thread @relation(fields: [thread_id], references: [id])
-  createdBy User?  @relation(fields: [created_by], references: [id], name: "CreatedReplies")
-  updatedBy User?  @relation(fields: [updated_by], references: [id], name: "UpdatedReplies")
+  user   User     @relation(fields: [user_id], references: [id])
+  thread Thread   @relation(fields: [thread_id], references: [id])
+  Like   Like[]
+  rchild Rchild[]
+}
+
+model Rchild {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  thread_id  Int
+  reply_id   Int
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user   User   @relation(fields: [user_id], references: [id])
+  thread Thread @relation(fields: [thread_id], references: [id])
+  reply  Reply  @relation(fields: [reply_id], references: [id])
 }
 
 model Like {
   id         Int      @id @default(autoincrement())
   user_id    Int
-  thread_id  Int
+  thread_id  Int?
+  reply_id   Int?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  created_by Int?
-  updated_by Int?
 
-  user      User   @relation(fields: [user_id], references: [id])
-  thread    Thread @relation(fields: [thread_id], references: [id])
-  createdBy User?  @relation(fields: [created_by], references: [id], name: "CreatedLikes")
-  updatedBy User?  @relation(fields: [updated_by], references: [id], name: "UpdatedLikes")
+  user   User    @relation(fields: [user_id], references: [id])
+  thread Thread? @relation(fields: [thread_id], references: [id])
+  reply  Reply?  @relation(fields: [reply_id], references: [id])
 }
 
 model Following {

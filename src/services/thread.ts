@@ -9,8 +9,6 @@ export async function createThread(data: {
     data: {
       content: data.content,
       image: data.image || null,
-      created_by: data.userId,
-      updated_by: data.userId,
       userId: data.userId,
     },
   });
@@ -18,22 +16,32 @@ export async function createThread(data: {
   return thread;
 }
 
-export async function getAllThreads() {
+export async function getAllThreads(
+  offset: number,
+  limit: number,
+  userId?: number
+) {
   const threads = await prisma.thread.findMany({
-    orderBy: {
-      created_at: "desc",
-    },
+    skip: offset,
+    take: limit,
+    orderBy: { created_at: "desc" },
     include: {
-      user: {
-        select: {
-          id: true,
-          username: true,
-          full_name: true,
-          photo_profile: true,
-        },
-      },
+      user: true,
+      likes: true, // <- agar bisa hitung jumlah like
     },
   });
 
-  return threads;
+  // hitung like + status like user
+  return threads.map((thread) => {
+    const likeCount = thread.likes.length;
+    const isLiked = userId
+      ? thread.likes.some((like) => like.user_id === userId)
+      : false;
+
+    return {
+      ...thread,
+      likeCount,
+      isLiked,
+    };
+  });
 }

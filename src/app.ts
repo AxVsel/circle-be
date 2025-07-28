@@ -9,6 +9,8 @@ import path from "path";
 import corsMiddleware from "./middlewares/cors";
 import loginRegister from "../src/routes/login-register";
 import thread from "../src/routes/thread";
+import reply from "../src/routes/reply";
+import like from "../src/routes/like";
 
 dotenv.config();
 
@@ -56,10 +58,16 @@ app.use(
   "/uploadThreads",
   express.static(path.join(__dirname, "..", "src/uploadThread"))
 );
+app.use(
+  "/uploadReplys",
+  express.static(path.join(__dirname, "..", "src/uploadReply"))
+);
 
 // Routes
 app.use("/api/v1/auth", loginRegister);
-app.use("/api/v1/auth", thread);
+app.use("/api/v1/thread", thread);
+app.use("/api/v1/reply", reply);
+app.use("/api/v1/likes", like);
 
 // Jalankan pakai `server.listen` (bukan `app.listen`)
 const PORT = process.env.PORT || 2200;

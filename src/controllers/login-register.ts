@@ -86,6 +86,7 @@ export async function handleLogin(req: Request, res: Response) {
         name: user.full_name,
         email: user.email,
         photo_profile: user.photo_profile ?? null,
+        background: user.background ?? null,
         token,
       },
     });

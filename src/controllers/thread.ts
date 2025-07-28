@@ -62,20 +62,27 @@ export async function handleCreateThread(req: Request, res: Response) {
   }
 }
 
+// controller.ts
 export async function handleGetAllThreads(req: Request, res: Response) {
   try {
-    const threads = await getAllThreads();
+    const offset = parseInt(req.query.offset as string) || 0;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const userId = req.session.user?.id;
+    // ← ambil ID user login
+
+    const threads = await getAllThreads(offset, limit, userId);
 
     const formatted = threads.map((thread) => {
-      if (!thread.user) {
-        throw new Error("Thread tidak memiliki user.");
-      }
+      if (!thread.user) throw new Error("Thread tidak memiliki user.");
 
       return {
         id: thread.id,
         user_id: thread.user.id,
         content: thread.content,
         image_url: thread.image ?? null,
+        number_of_replies: thread.number_of_replies ?? null,
+        like_count: thread.likeCount, // ← baru
+        is_liked: thread.isLiked, // ← baru
         timestamp: thread.created_at,
         user: {
           id: thread.user.id,
@@ -89,7 +96,7 @@ export async function handleGetAllThreads(req: Request, res: Response) {
     return res.status(200).json({
       code: 200,
       status: "success",
-      message: "Berhasil mengambil semua thread.",
+      message: "Berhasil mengambil thread.",
       data: {
         tweet: formatted,
       },
