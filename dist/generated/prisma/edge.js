@@ -198,6 +198,10 @@ const config = {
         "fromEnvVar": null,
         "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "debian-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -205,7 +209,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
+    "rootEnvPath": "../../../.env",
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -215,6 +219,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -223,8 +228,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            Int      @id @default(autoincrement())\n  username      String\n  full_name     String\n  email         String   @unique\n  password      String\n  photo_profile String?\n  background    String?\n  bio           String?\n  created_at    DateTime @default(now())\n  updated_at    DateTime @updatedAt\n\n  following Following[] @relation(\"FollowingUser\")\n  followers Following[] @relation(\"FollowerUser\")\n\n  replies Reply[]\n  threads Thread[]\n  likes   Like[]\n  rchild  Rchild[]\n}\n\nmodel Thread {\n  id                Int      @id @default(autoincrement())\n  content           String\n  image             String?\n  number_of_replies Int      @default(0)\n  created_at        DateTime @default(now())\n  updated_at        DateTime @updatedAt\n\n  replies Reply[]\n  likes   Like[]\n  userId  Int?\n  user    User?    @relation(fields: [userId], references: [id])\n  rchild  Rchild[]\n}\n\nmodel Reply {\n  id         Int      @id @default(autoincrement())\n  user_id    Int\n  thread_id  Int\n  image      String?\n  content    String\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  user   User     @relation(fields: [user_id], references: [id])\n  thread Thread   @relation(fields: [thread_id], references: [id])\n  Like   Like[]\n  rchild Rchild[]\n}\n\nmodel Rchild {\n  id         Int      @id @default(autoincrement())\n  user_id    Int\n  thread_id  Int\n  reply_id   Int\n  content    String\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  user   User   @relation(fields: [user_id], references: [id])\n  thread Thread @relation(fields: [thread_id], references: [id])\n  reply  Reply  @relation(fields: [reply_id], references: [id])\n}\n\nmodel Like {\n  id         Int      @id @default(autoincrement())\n  user_id    Int\n  thread_id  Int?\n  reply_id   Int?\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  user   User    @relation(fields: [user_id], references: [id])\n  thread Thread? @relation(fields: [thread_id], references: [id])\n  reply  Reply?  @relation(fields: [reply_id], references: [id])\n}\n\nmodel Following {\n  id           Int      @id @default(autoincrement())\n  following_id Int\n  follower_id  Int\n  created_at   DateTime @default(now())\n  updated_at   DateTime @updatedAt\n\n  following User @relation(\"FollowingUser\", fields: [following_id], references: [id])\n  follower  User @relation(\"FollowerUser\", fields: [follower_id], references: [id])\n}\n",
-  "inlineSchemaHash": "e41b7b2fe83bd5d5d069747c640b32d27ab3a487626faf5b08b850dfddbbd165",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\"]\n  output        = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id            Int      @id @default(autoincrement())\n  username      String\n  full_name     String\n  email         String   @unique\n  password      String\n  photo_profile String?\n  background    String?\n  bio           String?\n  created_at    DateTime @default(now())\n  updated_at    DateTime @updatedAt\n\n  following Following[] @relation(\"FollowingUser\")\n  followers Following[] @relation(\"FollowerUser\")\n\n  replies Reply[]\n  threads Thread[]\n  likes   Like[]\n  rchild  Rchild[]\n}\n\nmodel Thread {\n  id                Int      @id @default(autoincrement())\n  content           String\n  image             String?\n  number_of_replies Int      @default(0)\n  created_at        DateTime @default(now())\n  updated_at        DateTime @updatedAt\n\n  replies Reply[]\n  likes   Like[]\n  userId  Int?\n  user    User?    @relation(fields: [userId], references: [id])\n  rchild  Rchild[]\n}\n\nmodel Reply {\n  id         Int      @id @default(autoincrement())\n  user_id    Int\n  thread_id  Int\n  image      String?\n  content    String\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  user   User     @relation(fields: [user_id], references: [id])\n  thread Thread   @relation(fields: [thread_id], references: [id])\n  Like   Like[]\n  rchild Rchild[]\n}\n\nmodel Rchild {\n  id         Int      @id @default(autoincrement())\n  user_id    Int\n  thread_id  Int\n  reply_id   Int\n  content    String\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  user   User   @relation(fields: [user_id], references: [id])\n  thread Thread @relation(fields: [thread_id], references: [id])\n  reply  Reply  @relation(fields: [reply_id], references: [id])\n}\n\nmodel Like {\n  id         Int      @id @default(autoincrement())\n  user_id    Int\n  thread_id  Int?\n  reply_id   Int?\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  user   User    @relation(fields: [user_id], references: [id])\n  thread Thread? @relation(fields: [thread_id], references: [id])\n  reply  Reply?  @relation(fields: [reply_id], references: [id])\n}\n\nmodel Following {\n  id           Int      @id @default(autoincrement())\n  following_id Int\n  follower_id  Int\n  created_at   DateTime @default(now())\n  updated_at   DateTime @updatedAt\n\n  following User @relation(\"FollowingUser\", fields: [following_id], references: [id])\n  follower  User @relation(\"FollowerUser\", fields: [follower_id], references: [id])\n}\n",
+  "inlineSchemaHash": "bc575d7bc47fb97e340328101b144954ac4f4423d25e0bbc68c45cd5768c7107",
   "copyEngine": true
 }
 config.dirname = '/'
