@@ -5,7 +5,7 @@ import {
   toggleReplyLike,
   getThreadLikeCount,
   getReplyLikeCount,
-} from "../services/like";
+} from "../services/like-service";
 
 // Toggle like for thread
 export async function likeThread(req: Request, res: Response) {

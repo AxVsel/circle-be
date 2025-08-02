@@ -37,8 +37,8 @@ export async function registerUser(
     },
   });
 
-  const token = signToken({ id: user.id });
-  return { user, token };
+  // Hapus pembuatan token dari sini
+  return { user };
 }
 
 export async function loginUser(identifier: string, password: string) {

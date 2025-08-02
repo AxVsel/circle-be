@@ -1,6 +1,6 @@
 // controllers/replyController.ts
 import { Request, Response } from "express";
-import { createReply, getRepliesByThread } from "../services/reply";
+import { createReply, getRepliesByThread } from "../services/reply-service";
 
 export async function handleCreateReply(req: Request, res: Response) {
   const userId = req.session.user?.id;
