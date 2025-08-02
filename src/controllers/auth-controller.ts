@@ -42,7 +42,7 @@ export async function handleRegister(req: Request, res: Response) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000, // 1 hari
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      sameSite: "lax",
     });
 
     // Kirim response sukses
@@ -92,8 +92,9 @@ export async function handleLogin(req: Request, res: Response) {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      sameSite: "lax",
     });
 
     return res.status(200).json({
