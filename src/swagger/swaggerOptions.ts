@@ -16,6 +16,7 @@ export const swaggerOptions = {
         description: "Production server",
       },
     ],
+
     components: {
       securitySchemes: {
         bearerAuth: {

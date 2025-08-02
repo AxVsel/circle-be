@@ -51,9 +51,10 @@ app.use((0, express_session_1.default)({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: isProduction,
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
+        secure: process.env.NODE_ENV === "production", // true jika di production
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 24 * 60 * 60 * 1000, // 1 hari
     },
 }));
 // Static for image/thread uploads
