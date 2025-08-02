@@ -25,7 +25,6 @@ const isProduction = process.env.NODE_ENV === "production";
 const app = express();
 const server = http.createServer(app);
 const specs = swaggerJsdoc(swaggerOptions);
-
 connectRedis();
 // WebSocket Setup
 const io = new Server(server, {
@@ -55,9 +54,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: isProduction,
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production", // true jika di production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 hari
     },
   })
 );
