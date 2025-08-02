@@ -3,4 +3,6 @@ node_modules
 .env
 /src/uploadThread
 /src/uploadReply
+/src/uploadUser/background
+/src/uploadUser/profile
 /src/generated/prisma
