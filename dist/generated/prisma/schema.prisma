@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String
+  full_name     String
+  email         String   @unique
+  password      String
+  photo_profile String?
+  background    String?
+  bio           String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  following Following[] @relation("FollowingUser")
+  followers Following[] @relation("FollowerUser")
+
+  replies Reply[]
+  threads Thread[]
+  likes   Like[]
+  rchild  Rchild[]
+}
+
+model Thread {
+  id                Int      @id @default(autoincrement())
+  content           String
+  image             String?
+  number_of_replies Int?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  replies Reply[]
+  likes   Like[]
+  userId  Int?
+  user    User?    @relation(fields: [userId], references: [id])
+  Rchild  Rchild[]
+}
+
+model Reply {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  thread_id  Int
+  image      String?
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user   User     @relation(fields: [user_id], references: [id])
+  thread Thread   @relation(fields: [thread_id], references: [id])
+  Like   Like[]
+  Rchild Rchild[]
+}
+
+model Rchild {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  thread_id  Int
+  reply_id   Int
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user   User   @relation(fields: [user_id], references: [id])
+  thread Thread @relation(fields: [thread_id], references: [id])
+  reply  Reply  @relation(fields: [reply_id], references: [id])
+}
+
+model Like {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  thread_id  Int?
+  reply_id   Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user   User    @relation(fields: [user_id], references: [id])
+  thread Thread? @relation(fields: [thread_id], references: [id])
+  reply  Reply?  @relation(fields: [reply_id], references: [id])
+}
+
+model Following {
+  id           Int      @id @default(autoincrement())
+  following_id Int
+  follower_id  Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  following User @relation("FollowingUser", fields: [following_id], references: [id])
+  follower  User @relation("FollowerUser", fields: [follower_id], references: [id])
+}
