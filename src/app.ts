@@ -17,6 +17,7 @@ import user from "./routes/user-route";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import { swaggerOptions } from "./swagger/swaggerOptions";
+import { connectRedis } from "./redis/redisClient";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ const app = express();
 const server = http.createServer(app);
 const specs = swaggerJsdoc(swaggerOptions);
 
+connectRedis();
 // WebSocket Setup
 const io = new Server(server, {
   cors: {

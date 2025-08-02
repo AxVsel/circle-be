@@ -1,13 +1,24 @@
 // redisClient.ts
 import { createClient } from "redis";
+import dotenv from "dotenv";
 
-const client = createClient();
+dotenv.config(); // agar bisa baca .env kalau dijalankan lokal
 
-async function connectRedis() {
-  client.on("error", (err) => console.error("Redis Client Error", err));
-  await client.connect();
+const client = createClient({
+  url: process.env.REDIS_URL, // ambil dari env
+});
+
+client.on("error", (err) => {
+  console.error("❌ Redis Client Error:", err);
+});
+
+export async function connectRedis() {
+  try {
+    await client.connect();
+    console.log("✅ Redis connected successfully");
+  } catch (error) {
+    console.error("❌ Failed to connect to Redis:", error);
+  }
 }
-
-connectRedis(); // tidak pakai top-level await
 
 export default client;
