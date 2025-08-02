@@ -20,11 +20,13 @@ const user_route_1 = __importDefault(require("./routes/user-route"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swaggerOptions_1 = require("./swagger/swaggerOptions");
+const redisClient_1 = require("./redis/redisClient");
 dotenv_1.default.config();
 const isProduction = process.env.NODE_ENV === "production";
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const specs = (0, swagger_jsdoc_1.default)(swaggerOptions_1.swaggerOptions);
+(0, redisClient_1.connectRedis)();
 // WebSocket Setup
 const io = new socket_io_1.Server(server, {
     cors: {

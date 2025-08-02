@@ -8,15 +8,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.connectRedis = connectRedis;
 // redisClient.ts
 const redis_1 = require("redis");
-const client = (0, redis_1.createClient)();
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config(); // agar bisa baca .env kalau dijalankan lokal
+const client = (0, redis_1.createClient)({
+    url: process.env.REDIS_URL, // ambil dari env
+});
+client.on("error", (err) => {
+    console.error("❌ Redis Client Error:", err);
+});
 function connectRedis() {
     return __awaiter(this, void 0, void 0, function* () {
-        client.on("error", (err) => console.error("Redis Client Error", err));
-        yield client.connect();
+        try {
+            yield client.connect();
+            console.log("✅ Redis connected successfully");
+        }
+        catch (error) {
+            console.error("❌ Failed to connect to Redis:", error);
+        }
     });
 }
-connectRedis(); // tidak pakai top-level await
 exports.default = client;
