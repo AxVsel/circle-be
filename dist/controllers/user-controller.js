@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserProfile = void 0;
-const user_service_1 = require("../services/user-service");
-const updateUserProfile = async (req, res) => {
+import { editUser } from "../services/user-service";
+export const updateUserProfile = async (req, res) => {
     var _a, _b, _c, _d, _e, _f;
     const userId = parseInt(req.params.id); // ✅ sesuaikan dengan route
     const { full_name, username, bio } = req.body;
@@ -12,7 +9,7 @@ const updateUserProfile = async (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
     try {
-        const updatedUser = await (0, user_service_1.editUser)(userId, {
+        const updatedUser = await editUser(userId, {
             full_name,
             username,
             photo_profile,
@@ -31,4 +28,3 @@ const updateUserProfile = async (req, res) => {
         });
     }
 };
-exports.updateUserProfile = updateUserProfile;

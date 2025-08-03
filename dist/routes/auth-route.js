@@ -1,11 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const auth_controller_1 = require("../controllers/auth-controller");
-const router = express_1.default.Router();
+import express from "express";
+import { handleRegister, handleLogin, handleLogout, } from "../controllers/auth-controller";
+const router = express.Router();
 /**
  * @swagger
  * tags:
@@ -46,7 +41,7 @@ const router = express_1.default.Router();
  *       500:
  *         description: Server error
  */
-router.post("/register", auth_controller_1.handleRegister);
+router.post("/register", handleRegister);
 /**
  * @swagger
  * /auth/login:
@@ -76,7 +71,7 @@ router.post("/register", auth_controller_1.handleRegister);
  *       500:
  *         description: Server error
  */
-router.post("/login", auth_controller_1.handleLogin);
+router.post("/login", handleLogin);
 /**
  * @swagger
  * /auth/logout:
@@ -89,5 +84,5 @@ router.post("/login", auth_controller_1.handleLogin);
  *       500:
  *         description: Server error
  */
-router.post("/logout", auth_controller_1.handleLogout);
-exports.default = router;
+router.post("/logout", handleLogout);
+export default router;

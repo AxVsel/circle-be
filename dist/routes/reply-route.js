@@ -1,13 +1,8 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const reply_controller_1 = require("../controllers/reply-controller");
-const auth_1 = require("../middlewares/auth");
-const multer_reply_1 = require("../utils/multer-reply");
-const router = express_1.default.Router();
+import express from "express";
+import { handleCreateReply, handleGetReplies, } from "../controllers/reply-controller";
+import { requireAuth } from "../middlewares/auth";
+import { uploadReply } from "../utils/multer-reply";
+const router = express.Router();
 /**
  * @swagger
  * tags:
@@ -61,7 +56,7 @@ const router = express_1.default.Router();
  *       500:
  *         description: Gagal membuat reply
  */
-router.post("/threads/:threadId/replies", auth_1.requireAuth, multer_reply_1.uploadReply.single("image"), reply_controller_1.handleCreateReply);
+router.post("/threads/:threadId/replies", requireAuth, uploadReply.single("image"), handleCreateReply);
 /**
  * @swagger
  * /reply/threads/{threadId}/replies:
@@ -94,5 +89,5 @@ router.post("/threads/:threadId/replies", auth_1.requireAuth, multer_reply_1.upl
  *       500:
  *         description: Gagal mengambil replies
  */
-router.get("/threads/:threadId/replies", auth_1.requireAuth, reply_controller_1.handleGetReplies);
-exports.default = router;
+router.get("/threads/:threadId/replies", requireAuth, handleGetReplies);
+export default router;

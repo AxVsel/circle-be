@@ -1,16 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleRegister = handleRegister;
-exports.handleLogin = handleLogin;
-exports.handleLogout = handleLogout;
-const auth_service_1 = require("../services/auth-service");
-const login_register_1 = require("../validations/login-register");
-const jwt_1 = require("../utils/jwt");
-async function handleRegister(req, res) {
+import { registerUser, loginUser } from "../services/auth-service";
+import { registerSchema } from "../validations/login-register";
+import { signToken } from "../utils/jwt";
+export async function handleRegister(req, res) {
     var _a, _b;
     try {
         // Validasi request body
-        const { error } = login_register_1.registerSchema.validate(req.body);
+        const { error } = registerSchema.validate(req.body);
         if (error) {
             return res.status(400).json({
                 code: 400,
@@ -24,7 +19,7 @@ async function handleRegister(req, res) {
         const photo_profile = `https://api.dicebear.com/9.x/adventurer/svg?seed=${full_name}`;
         const background = `https://api.dicebear.com/9.x/glass/svg?seed=${username}`;
         // Daftarkan user
-        const { user } = await (0, auth_service_1.registerUser)(username, full_name, email, password, photo_profile, background);
+        const { user } = await registerUser(username, full_name, email, password, photo_profile, background);
         // Simpan ke dalam session
         req.session.user = {
             id: user.id,
@@ -32,7 +27,7 @@ async function handleRegister(req, res) {
             email: user.email,
         };
         // Buat token dan simpan ke cookie
-        const token = (0, jwt_1.signToken)({ id: user.id });
+        const token = signToken({ id: user.id });
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
@@ -64,11 +59,11 @@ async function handleRegister(req, res) {
         });
     }
 }
-async function handleLogin(req, res) {
+export async function handleLogin(req, res) {
     var _a, _b;
     try {
         const { identifier, password } = req.body;
-        const user = await (0, auth_service_1.loginUser)(identifier, password);
+        const user = await loginUser(identifier, password);
         if (!user) {
             return res.status(401).json({
                 code: 401,
@@ -81,7 +76,7 @@ async function handleLogin(req, res) {
             username: user.username,
             email: user.email,
         };
-        const token = (0, jwt_1.signToken)({ id: user.id });
+        const token = signToken({ id: user.id });
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
@@ -113,7 +108,7 @@ async function handleLogin(req, res) {
         });
     }
 }
-async function handleLogout(req, res) {
+export async function handleLogout(req, res) {
     try {
         // Hapus session dari server
         req.session.destroy((err) => {

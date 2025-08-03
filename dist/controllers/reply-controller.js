@@ -1,9 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleCreateReply = handleCreateReply;
-exports.handleGetReplies = handleGetReplies;
-const reply_service_1 = require("../services/reply-service");
-async function handleCreateReply(req, res) {
+import { createReply, getRepliesByThread } from "../services/reply-service";
+export async function handleCreateReply(req, res) {
     var _a, _b;
     const userId = (_a = req.session.user) === null || _a === void 0 ? void 0 : _a.id;
     if (!userId)
@@ -17,7 +13,7 @@ async function handleCreateReply(req, res) {
     if (!content) {
         return res.status(400).json({ message: "Content is required" });
     }
-    const reply = await (0, reply_service_1.createReply)({
+    const reply = await createReply({
         user_id: userId,
         thread_id: threadId,
         content,
@@ -31,10 +27,10 @@ async function handleCreateReply(req, res) {
     });
     res.status(201).json({ message: "Reply created", reply });
 }
-async function handleGetReplies(req, res) {
+export async function handleGetReplies(req, res) {
     try {
         const threadId = Number(req.params.threadId);
-        const replies = await (0, reply_service_1.getRepliesByThread)(threadId);
+        const replies = await getRepliesByThread(threadId);
         res.json({ replies });
     }
     catch (err) {

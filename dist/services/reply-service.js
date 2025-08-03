@@ -1,11 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createReply = createReply;
-exports.getRepliesByThread = getRepliesByThread;
-const client_1 = require("../prisma/client");
-async function createReply(data) {
+import { prisma } from "../prisma/client";
+export async function createReply(data) {
     // Validasi thread_id jika perlu
-    const thread = await client_1.prisma.thread.findUnique({
+    const thread = await prisma.thread.findUnique({
         where: { id: data.thread_id },
         select: { id: true },
     });
@@ -13,8 +9,8 @@ async function createReply(data) {
         throw new Error("thread_id tidak valid");
     }
     // Transaksi: buat reply + update jumlah reply
-    const [reply] = await client_1.prisma.$transaction([
-        client_1.prisma.reply.create({
+    const [reply] = await prisma.$transaction([
+        prisma.reply.create({
             data: {
                 user_id: data.user_id,
                 thread_id: data.thread_id,
@@ -23,7 +19,7 @@ async function createReply(data) {
                 created_at: new Date(),
             },
         }),
-        client_1.prisma.thread.update({
+        prisma.thread.update({
             where: { id: data.thread_id },
             data: {
                 number_of_replies: {
@@ -34,8 +30,8 @@ async function createReply(data) {
     ]);
     return reply;
 }
-async function getRepliesByThread(threadId) {
-    const replies = await client_1.prisma.reply.findMany({
+export async function getRepliesByThread(threadId) {
+    const replies = await prisma.reply.findMany({
         where: { thread_id: threadId },
         include: {
             user: {

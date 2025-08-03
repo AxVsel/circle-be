@@ -1,13 +1,8 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const user_controller_1 = require("../controllers/user-controller");
-const auth_1 = require("../middlewares/auth");
-const multer_user_1 = require("../utils/multer-user");
-const router = express_1.default.Router();
+import express from "express";
+import { updateUserProfile } from "../controllers/user-controller";
+import { requireAuth } from "../middlewares/auth";
+import { uploadUser } from "../utils/multer-user";
+const router = express.Router();
 /**
  * @swagger
  * tags:
@@ -100,8 +95,8 @@ const router = express_1.default.Router();
  *                 error:
  *                   type: string
  */
-router.put("/user/:id", auth_1.requireAuth, multer_user_1.uploadUser.fields([
+router.put("/user/:id", requireAuth, uploadUser.fields([
     { name: "photo_profile", maxCount: 1 },
     { name: "background", maxCount: 1 },
-]), user_controller_1.updateUserProfile);
-exports.default = router;
+]), updateUserProfile);
+export default router;

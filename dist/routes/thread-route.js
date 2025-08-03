@@ -1,13 +1,8 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const thread_controller_1 = require("../controllers/thread-controller");
-const auth_1 = require("../middlewares/auth");
-const multer_thread_1 = require("../utils/multer-thread");
-const router = express_1.default.Router();
+import express from "express";
+import { handleCreateThread, handleGetAllThreads, } from "../controllers/thread-controller";
+import { requireAuth } from "../middlewares/auth";
+import { uploadThread } from "../utils/multer-thread";
+const router = express.Router();
 /**
  * @swagger
  * tags:
@@ -59,7 +54,7 @@ const router = express_1.default.Router();
  *       401:
  *         description: Unauthorized
  */
-router.post("/threads", auth_1.requireAuth, multer_thread_1.uploadThread.single("image"), thread_controller_1.handleCreateThread);
+router.post("/threads", requireAuth, uploadThread.single("image"), handleCreateThread);
 /**
  * @swagger
  * /thread/threads:
@@ -134,5 +129,5 @@ router.post("/threads", auth_1.requireAuth, multer_thread_1.uploadThread.single(
  *       401:
  *         description: Unauthorized
  */
-router.get("/threads", auth_1.requireAuth, thread_controller_1.handleGetAllThreads);
-exports.default = router;
+router.get("/threads", requireAuth, handleGetAllThreads);
+export default router;

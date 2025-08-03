@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.swaggerOptions = void 0;
 // src/swagger/swaggerOptions.ts
-exports.swaggerOptions = {
+export const swaggerOptions = {
     definition: {
         openapi: "3.0.0",
         info: {

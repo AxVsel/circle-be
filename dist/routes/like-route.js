@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const like_controller_1 = require("../controllers/like-controller");
-const auth_1 = require("../middlewares/auth");
-const router = (0, express_1.Router)();
+import { Router } from "express";
+import { likeThread, likeReply, getThreadLikes, getReplyLikes, } from "../controllers/like-controller";
+import { requireAuth } from "../middlewares/auth";
+const router = Router();
 /**
  * @swagger
  * tags:
@@ -42,7 +40,7 @@ const router = (0, express_1.Router)();
  *       401:
  *         description: Unauthorized
  */
-router.post("/threads/:threadId", auth_1.requireAuth, like_controller_1.likeThread);
+router.post("/threads/:threadId", requireAuth, likeThread);
 /**
  * @swagger
  * /likes/threads/{threadId}:
@@ -73,7 +71,7 @@ router.post("/threads/:threadId", auth_1.requireAuth, like_controller_1.likeThre
  *       401:
  *         description: Unauthorized
  */
-router.get("/threads/:threadId", auth_1.requireAuth, like_controller_1.getThreadLikes);
+router.get("/threads/:threadId", requireAuth, getThreadLikes);
 /**
  * @swagger
  * /likes/replies/{replyId}:
@@ -106,7 +104,7 @@ router.get("/threads/:threadId", auth_1.requireAuth, like_controller_1.getThread
  *       401:
  *         description: Unauthorized
  */
-router.post("/replies/:replyId", auth_1.requireAuth, like_controller_1.likeReply);
+router.post("/replies/:replyId", requireAuth, likeReply);
 /**
  * @swagger
  * /likes/replies/{replyId}:
@@ -137,5 +135,5 @@ router.post("/replies/:replyId", auth_1.requireAuth, like_controller_1.likeReply
  *       401:
  *         description: Unauthorized
  */
-router.get("/replies/:replyId", auth_1.requireAuth, like_controller_1.getReplyLikes);
-exports.default = router;
+router.get("/replies/:replyId", requireAuth, getReplyLikes);
+export default router;

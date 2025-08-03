@@ -1,46 +1,38 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isFollowing = exports.getAllUsersWithFollowData = exports.getFollowing = exports.getFollowers = exports.unfollowUser = exports.followUser = void 0;
-exports.getFollowCounts = getFollowCounts;
 // // services/like.service.ts
-const client_1 = require("../prisma/client");
+import { prisma } from "../prisma/client";
 // Like/unlike thread
-const followUser = async (follower_id, following_id) => {
+export const followUser = async (follower_id, following_id) => {
     if (follower_id === following_id)
         throw new Error("Cannot follow yourself");
     // Cek apakah sudah follow
-    const existing = await client_1.prisma.following.findFirst({
+    const existing = await prisma.following.findFirst({
         where: { follower_id, following_id },
     });
     if (existing)
         throw new Error("Already following");
-    return client_1.prisma.following.create({
+    return prisma.following.create({
         data: { follower_id, following_id },
     });
 };
-exports.followUser = followUser;
-const unfollowUser = async (follower_id, following_id) => {
-    return client_1.prisma.following.deleteMany({
+export const unfollowUser = async (follower_id, following_id) => {
+    return prisma.following.deleteMany({
         where: { follower_id, following_id },
     });
 };
-exports.unfollowUser = unfollowUser;
-const getFollowers = async (userId) => {
-    return client_1.prisma.following.findMany({
+export const getFollowers = async (userId) => {
+    return prisma.following.findMany({
         where: { following_id: userId },
         include: { follower: true },
     });
 };
-exports.getFollowers = getFollowers;
-const getFollowing = async (userId) => {
-    return client_1.prisma.following.findMany({
+export const getFollowing = async (userId) => {
+    return prisma.following.findMany({
         where: { follower_id: userId },
         include: { following: true },
     });
 };
-exports.getFollowing = getFollowing;
-const getAllUsersWithFollowData = async (searchTerm) => {
-    return client_1.prisma.user.findMany({
+export const getAllUsersWithFollowData = async (searchTerm) => {
+    return prisma.user.findMany({
         where: searchTerm
             ? {
                 OR: [
@@ -90,24 +82,22 @@ const getAllUsersWithFollowData = async (searchTerm) => {
         },
     });
 };
-exports.getAllUsersWithFollowData = getAllUsersWithFollowData;
-async function getFollowCounts(userId) {
-    const followersCount = await client_1.prisma.following.count({
+export async function getFollowCounts(userId) {
+    const followersCount = await prisma.following.count({
         where: {
             following_id: userId,
         },
     });
-    const followingsCount = await client_1.prisma.following.count({
+    const followingsCount = await prisma.following.count({
         where: {
             follower_id: userId,
         },
     });
     return { followersCount, followingsCount };
 }
-const isFollowing = async (follower_id, following_id) => {
-    const follow = await client_1.prisma.following.findFirst({
+export const isFollowing = async (follower_id, following_id) => {
+    const follow = await prisma.following.findFirst({
         where: { follower_id, following_id },
     });
     return !!follow;
 };
-exports.isFollowing = isFollowing;
