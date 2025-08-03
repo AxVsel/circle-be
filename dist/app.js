@@ -29,7 +29,11 @@ const specs = (0, swagger_jsdoc_1.default)(swaggerOptions_1.swaggerOptions);
 // WebSocket Setup
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: "http://localhost:5173", // frontend
+        origin: [
+            "http://localhost:5173", // untuk dev lokal
+            "https://circle-fe-a3mm.vercel.app", // ✅ untuk vercel production
+        ],
+        methods: ["GET", "POST"],
         credentials: true,
     },
 });
