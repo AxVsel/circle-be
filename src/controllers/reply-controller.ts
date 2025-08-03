@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { createReply, getRepliesByThread } from "../services/reply-service";
 
 export async function handleCreateReply(req: Request, res: Response) {
-  const userId = req.session.user?.id;
+  const userId = Number((req as any).user?.id);
   if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
   const image = req.file?.filename;

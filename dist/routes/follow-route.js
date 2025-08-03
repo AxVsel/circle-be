@@ -1,8 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 // routes/like.routes.ts
-import { Router } from "express";
-import { follow, unfollow, followers, followings, followCounts, checkFollowing, getAllUsersWithFollows, } from "../controllers/follow-controller";
-import { requireAuth } from "../middlewares/auth"; // jika ada auth
-const router = Router();
+const express_1 = require("express");
+const follow_controller_1 = require("../controllers/follow-controller");
+const auth_1 = require("../middlewares/auth"); // jika ada auth
+const router = (0, express_1.Router)();
 /**
  * @swagger
  * tags:
@@ -170,11 +172,11 @@ const router = Router();
  *       500:
  *         description: Gagal mengambil data
  */
-router.post("/follow", requireAuth, follow);
-router.post("/unfollow", requireAuth, unfollow);
-router.get("/users/follow-data", requireAuth, getAllUsersWithFollows);
-router.get("/followers/:userId", requireAuth, followers);
-router.get("/followings/:userId", requireAuth, followings);
-router.get("/follow/counts/:userId", requireAuth, followCounts);
-router.get("/is-following/:userId", requireAuth, checkFollowing);
-export default router;
+router.post("/follow", auth_1.requireAuth, follow_controller_1.follow);
+router.post("/unfollow", auth_1.requireAuth, follow_controller_1.unfollow);
+router.get("/users/follow-data", auth_1.requireAuth, follow_controller_1.getAllUsersWithFollows);
+router.get("/followers/:userId", auth_1.requireAuth, follow_controller_1.followers);
+router.get("/followings/:userId", auth_1.requireAuth, follow_controller_1.followings);
+router.get("/follow/counts/:userId", auth_1.requireAuth, follow_controller_1.followCounts);
+router.get("/is-following/:userId", auth_1.requireAuth, follow_controller_1.checkFollowing);
+exports.default = router;

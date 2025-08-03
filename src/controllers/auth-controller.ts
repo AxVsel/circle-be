@@ -29,13 +29,6 @@ export async function handleRegister(req: Request, res: Response) {
       background
     );
 
-    // Simpan ke dalam session
-    (req.session as any).user = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    };
-
     // Buat token dan simpan ke cookie
     const token = signToken({ id: user.id });
     res.cookie("token", token, {
@@ -82,12 +75,6 @@ export async function handleLogin(req: Request, res: Response) {
         message: "Username/email atau password salah.",
       });
     }
-    (req.session as any).user = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    };
-
     const token = signToken({ id: user.id });
     res.cookie("token", token, {
       httpOnly: true,
@@ -123,32 +110,18 @@ export async function handleLogin(req: Request, res: Response) {
 
 export async function handleLogout(req: Request, res: Response) {
   try {
-    // Hapus session dari server
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("❌ Error saat destroy session:", err);
-        return res.status(500).json({
-          code: 500,
-          status: "error",
-          message: "Gagal logout.",
-        });
-      }
+    // Hapus token cookie dari client
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/", // agar cookie benar-benar terhapus
+    });
 
-      // Hapus cookie dari client
-      res.clearCookie("connect.sid", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/", // penting agar cocok dengan path cookie
-      });
-
-      res.clearCookie("token");
-
-      return res.status(200).json({
-        code: 200,
-        status: "success",
-        message: "Logout berhasil.",
-      });
+    return res.status(200).json({
+      code: 200,
+      status: "success",
+      message: "Logout berhasil.",
     });
   } catch (err) {
     console.error("❌ Error Logout:", err);

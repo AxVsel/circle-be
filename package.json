@@ -2,9 +2,8 @@
   "name": "circle-backend",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "dev": "nodemon",
+    "dev": "nodemon src/app.ts",
     "build": "prisma generate && tsc",
     "start": "node dist/app.js"
   },

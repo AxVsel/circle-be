@@ -1,7 +1,11 @@
-import { createReply, getRepliesByThread } from "../services/reply-service";
-export async function handleCreateReply(req, res) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handleCreateReply = handleCreateReply;
+exports.handleGetReplies = handleGetReplies;
+const reply_service_1 = require("../services/reply-service");
+async function handleCreateReply(req, res) {
     var _a, _b;
-    const userId = (_a = req.session.user) === null || _a === void 0 ? void 0 : _a.id;
+    const userId = Number((_a = req.user) === null || _a === void 0 ? void 0 : _a.id);
     if (!userId)
         return res.status(401).json({ message: "Unauthorized" });
     const image = (_b = req.file) === null || _b === void 0 ? void 0 : _b.filename;
@@ -13,7 +17,7 @@ export async function handleCreateReply(req, res) {
     if (!content) {
         return res.status(400).json({ message: "Content is required" });
     }
-    const reply = await createReply({
+    const reply = await (0, reply_service_1.createReply)({
         user_id: userId,
         thread_id: threadId,
         content,
@@ -27,10 +31,10 @@ export async function handleCreateReply(req, res) {
     });
     res.status(201).json({ message: "Reply created", reply });
 }
-export async function handleGetReplies(req, res) {
+async function handleGetReplies(req, res) {
     try {
         const threadId = Number(req.params.threadId);
-        const replies = await getRepliesByThread(threadId);
+        const replies = await (0, reply_service_1.getRepliesByThread)(threadId);
         res.json({ replies });
     }
     catch (err) {

@@ -1,7 +1,14 @@
-import { createThread, getAllThreads } from "../services/thread-service";
-import { getRedisClient } from "../redis/redisClient";
-import { prisma } from "../prisma/client";
-export async function handleCreateThread(req, res) {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handleCreateThread = handleCreateThread;
+exports.handleGetAllThreads = handleGetAllThreads;
+const thread_service_1 = require("../services/thread-service");
+const redisClient_1 = __importDefault(require("../redis/redisClient"));
+const client_1 = require("../prisma/client");
+async function handleCreateThread(req, res) {
     var _a;
     try {
         const { content } = req.body;
@@ -10,12 +17,12 @@ export async function handleCreateThread(req, res) {
             return res.status(401).json({ message: "Unauthorized" });
         }
         const imagePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
-        const newThread = await createThread({
+        const newThread = await (0, thread_service_1.createThread)({
             content,
             image: imagePath,
             userId: user.id,
         });
-        const threadWithUser = await prisma.thread.findFirst({
+        const threadWithUser = await client_1.prisma.thread.findFirst({
             where: { id: newThread.id },
             include: {
                 user: {
@@ -28,11 +35,10 @@ export async function handleCreateThread(req, res) {
                 },
             },
         });
-        const redisClient = getRedisClient();
         // ⏺️ Simpan ke Redis
         if (threadWithUser) {
-            await redisClient.lPush("latest_threads", JSON.stringify(threadWithUser));
-            await redisClient.lTrim("latest_threads", 0, 49); // simpan max 50 thread
+            await redisClient_1.default.lPush("latest_threads", JSON.stringify(threadWithUser));
+            await redisClient_1.default.lTrim("latest_threads", 0, 49); // simpan max 50 thread
         }
         const io = req.app.locals.io;
         io.emit("new-thread", {
@@ -67,16 +73,15 @@ export async function handleCreateThread(req, res) {
     }
 }
 // controller.ts
-export async function handleGetAllThreads(req, res) {
+async function handleGetAllThreads(req, res) {
     var _a;
     try {
         const offset = parseInt(req.query.offset) || 0;
         const limit = parseInt(req.query.limit) || 10;
-        const userId = (_a = req.session.user) === null || _a === void 0 ? void 0 : _a.id;
+        const userId = Number((_a = req.user) === null || _a === void 0 ? void 0 : _a.id);
         const cacheKey = `threads:offset=${offset}:limit=${limit}:user=${userId !== null && userId !== void 0 ? userId : "guest"}`;
-        const redisClient = getRedisClient();
         // 🔍 Cek cache Redis
-        const cached = await redisClient.get(cacheKey);
+        const cached = await redisClient_1.default.get(cacheKey);
         if (cached) {
             return res.status(200).json({
                 code: 200,
@@ -88,7 +93,7 @@ export async function handleGetAllThreads(req, res) {
             });
         }
         // 🚀 Ambil dari DB kalau belum ada di cache
-        const threads = await getAllThreads(offset, limit, userId);
+        const threads = await (0, thread_service_1.getAllThreads)(offset, limit, userId);
         const formatted = threads.map((thread) => {
             var _a, _b;
             if (!thread.user)
@@ -110,7 +115,7 @@ export async function handleGetAllThreads(req, res) {
                 },
             };
         });
-        await redisClient.set(cacheKey, JSON.stringify(formatted), {
+        await redisClient_1.default.set(cacheKey, JSON.stringify(formatted), {
             EX: 60,
         });
         console.log("💾 Data thread disimpan di Redis dengan key:", cacheKey);

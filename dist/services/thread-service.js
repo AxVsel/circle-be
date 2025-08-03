@@ -1,6 +1,10 @@
-import { prisma } from "../prisma/client";
-export async function createThread(data) {
-    const thread = await prisma.thread.create({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createThread = createThread;
+exports.getAllThreads = getAllThreads;
+const client_1 = require("../prisma/client");
+async function createThread(data) {
+    const thread = await client_1.prisma.thread.create({
         data: {
             content: data.content,
             image: data.image || null,
@@ -9,8 +13,8 @@ export async function createThread(data) {
     });
     return thread;
 }
-export async function getAllThreads(offset, limit, userId) {
-    const threads = await prisma.thread.findMany({
+async function getAllThreads(offset, limit, userId) {
+    const threads = await client_1.prisma.thread.findMany({
         skip: offset,
         take: limit,
         orderBy: { created_at: "desc" },

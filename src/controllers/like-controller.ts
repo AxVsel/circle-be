@@ -9,7 +9,7 @@ import {
 
 // Toggle like for thread
 export async function likeThread(req: Request, res: Response) {
-  const userId = req.session.user?.id;
+  const userId = Number((req as any).user?.id);
   const threadId = Number(req.params.threadId);
 
   if (!userId) return res.status(401).json({ message: "Unauthorized" });
@@ -22,7 +22,7 @@ export async function likeThread(req: Request, res: Response) {
 
 // Toggle like for reply
 export async function likeReply(req: Request, res: Response) {
-  const userId = req.session.user?.id;
+  const userId = Number((req as any).user?.id);
   const replyId = Number(req.params.replyId);
 
   if (!userId) return res.status(401).json({ message: "Unauthorized" });

@@ -10,12 +10,11 @@ import {
 } from "../services/follow-service";
 
 export const follow = async (req: Request, res: Response) => {
-  const follower_id = Number(req.session.user?.id); // diasumsikan user login
+  const follower_id = Number((req as any).user?.id);
   const { following_id } = req.body;
-  if (!req.session.user) {
+  if (!follower_id) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-
   try {
     const result = await followUser(follower_id, Number(following_id));
     res.json(result);
@@ -25,9 +24,9 @@ export const follow = async (req: Request, res: Response) => {
 };
 
 export const unfollow = async (req: Request, res: Response) => {
-  const follower_id = Number(req.session.user?.id);
+  const follower_id = Number((req as any).user?.id);
   const { following_id } = req.body;
-  if (!req.session.user) {
+  if (!follower_id) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
@@ -38,7 +37,7 @@ export const unfollow = async (req: Request, res: Response) => {
 export const followers = async (req: Request, res: Response) => {
   const userId = Number(req.params.userId);
   const result = await getFollowers(userId);
-  if (!req.session.user) {
+  if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
@@ -48,7 +47,7 @@ export const followers = async (req: Request, res: Response) => {
 export const followings = async (req: Request, res: Response) => {
   const userId = Number(req.params.userId);
   const result = await getFollowing(userId);
-  if (!req.session.user) {
+  if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
@@ -92,7 +91,7 @@ export const getAllUsersWithFollows = async (req: Request, res: Response) => {
 };
 
 export const checkFollowing = async (req: Request, res: Response) => {
-  const follower_id = Number(req.session.user?.id);
+  const follower_id = Number((req as any).user?.id);
   const following_id = Number(req.params.userId);
   const result = await isFollowing(follower_id, following_id);
   if (!req.session.user) {

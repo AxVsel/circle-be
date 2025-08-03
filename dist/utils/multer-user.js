@@ -1,8 +1,14 @@
-import multer from "multer";
-import path from "path";
-import fs from "fs";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.uploadUser = void 0;
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 // Konfigurasi storage dinamis berdasarkan fieldname
-const storage = multer.diskStorage({
+const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
         let uploadPath = "src/uploadUser/";
         if (file.fieldname === "photo_profile") {
@@ -12,7 +18,7 @@ const storage = multer.diskStorage({
             uploadPath += "background/";
         }
         // Pastikan folder ada
-        fs.mkdirSync(uploadPath, { recursive: true });
+        fs_1.default.mkdirSync(uploadPath, { recursive: true });
         cb(null, uploadPath);
     },
     filename: (_req, file, cb) => {
@@ -23,7 +29,7 @@ const storage = multer.diskStorage({
 });
 // Filter file hanya untuk gambar
 const fileFilter = (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
+    const ext = path_1.default.extname(file.originalname).toLowerCase();
     const allowed = [".jpg", ".jpeg", ".png"];
     if (!allowed.includes(ext)) {
         return cb(new Error("Only .jpg, .jpeg, and .png files are allowed"));
@@ -31,7 +37,7 @@ const fileFilter = (_req, file, cb) => {
     cb(null, true);
 };
 // Middleware upload dengan 2 field: photo_profile & background
-export const uploadUser = multer({
+exports.uploadUser = (0, multer_1.default)({
     storage,
     fileFilter,
     limits: {

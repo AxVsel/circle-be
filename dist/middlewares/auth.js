@@ -1,5 +1,8 @@
-import { verifyToken } from "../utils/jwt"; // pastikan ini mengembalikan payload token yang sudah didecode
-export function requireAuth(req, res, next) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.requireAuth = requireAuth;
+const jwt_1 = require("../utils/jwt"); // pastikan ini mengembalikan payload token yang sudah didecode
+function requireAuth(req, res, next) {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(" ")[1];
     if (!token) {
@@ -10,7 +13,7 @@ export function requireAuth(req, res, next) {
         });
     }
     try {
-        const decoded = verifyToken(token);
+        const decoded = (0, jwt_1.verifyToken)(token);
         req.user = decoded;
         next();
     }
