@@ -47,7 +47,8 @@ export const followers = async (req: Request, res: Response) => {
 export const followings = async (req: Request, res: Response) => {
   const userId = Number(req.params.userId);
   const result = await getFollowing(userId);
-  if (!userId) {
+  const user = (req as any).user;
+  if (!user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
@@ -59,7 +60,8 @@ export const followCounts = async (req: Request, res: Response) => {
   if (isNaN(userId)) {
     return res.status(400).json({ message: "Invalid userId" });
   }
-  if (!req.session.user) {
+  const user = (req as any).user;
+  if (!user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   try {
@@ -94,7 +96,7 @@ export const checkFollowing = async (req: Request, res: Response) => {
   const follower_id = Number((req as any).user?.id);
   const following_id = Number(req.params.userId);
   const result = await isFollowing(follower_id, following_id);
-  if (!req.session.user) {
+  if (!follower_id) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
