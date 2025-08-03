@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",                                 
-    "module": "commonjs",                              
+    "module": "esnext",                              
     "rootDir": "./src",     
      "moduleResolution": "node",                             
     "typeRoots": ["./types", "./node_modules/@types"],                                                  

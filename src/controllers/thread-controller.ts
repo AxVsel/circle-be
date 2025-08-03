@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createThread, getAllThreads } from "../services/thread-service";
-import redisClient from "../redis/redisClient";
+import { getRedisClient } from "../redis/redisClient";
 import { prisma } from "../prisma/client";
 
 export async function handleCreateThread(req: Request, res: Response) {
@@ -32,7 +32,7 @@ export async function handleCreateThread(req: Request, res: Response) {
         },
       },
     });
-
+    const redisClient = getRedisClient();
     // ⏺️ Simpan ke Redis
     if (threadWithUser) {
       await redisClient.lPush("latest_threads", JSON.stringify(threadWithUser));
@@ -82,7 +82,7 @@ export async function handleGetAllThreads(req: Request, res: Response) {
     const cacheKey = `threads:offset=${offset}:limit=${limit}:user=${
       userId ?? "guest"
     }`;
-
+    const redisClient = getRedisClient();
     // 🔍 Cek cache Redis
     const cached = await redisClient.get(cacheKey);
     if (cached) {

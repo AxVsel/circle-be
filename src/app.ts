@@ -4,7 +4,6 @@ import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import path from "path";
 
 import corsMiddleware from "./middlewares/cors";
 import auth from "./routes/auth-route";
@@ -17,15 +16,29 @@ import user from "./routes/user-route";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import { swaggerOptions } from "./swagger/swaggerOptions";
-import { connectRedis } from "./redis/redisClient";
+
+import connectRedis from "connect-redis";
+import { createClient } from "redis";
+
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const isProduction = process.env.NODE_ENV === "production";
 const app = express();
 const server = http.createServer(app);
 const specs = swaggerJsdoc(swaggerOptions);
-connectRedis();
+const RedisStore = connectRedis(session);
+
+const redisClient = createClient({
+  url: process.env.REDIS_URL,
+});
+
+await redisClient.connect();
+
 // WebSocket Setup
 const io = new Server(server, {
   cors: {
@@ -50,6 +63,7 @@ app.use(cookieParser());
 
 app.use(
   session({
+    store: new RedisStore({ client: redisClient as any }),
     secret: process.env.SESSION_SECRET as string,
     resave: false,
     saveUninitialized: false,
