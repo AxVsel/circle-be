@@ -1,8 +1,4 @@
 node_modules
 # Keep environment variables out of version control
 .env
-/src/uploadThread
-/src/uploadReply
-/src/uploadUser/background
-/src/uploadUser/profile
 /src/generated/prisma
