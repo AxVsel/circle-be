@@ -1,5 +1,9 @@
 import express from "express";
-import { updateUserProfile } from "../controllers/user-controller";
+import {
+  updateUserProfile,
+  handleGetMyThreads,
+  handleGetMyMediaThreads,
+} from "../controllers/user-controller";
 import { requireAuth } from "../middlewares/auth";
 import { uploadUser } from "../utils/multer-user";
 const router = express.Router();
@@ -97,6 +101,8 @@ const router = express.Router();
  *                   type: string
  */
 
+router.get("/my", requireAuth, handleGetMyThreads);
+router.get("/my/media", requireAuth, handleGetMyMediaThreads);
 router.put(
   "/user/:id",
   requireAuth,

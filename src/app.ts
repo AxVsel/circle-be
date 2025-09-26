@@ -20,7 +20,6 @@ import { connectRedis } from "./redis/redisClient";
 
 dotenv.config();
 
-const isProduction = process.env.NODE_ENV === "production";
 const app = express();
 const server = http.createServer(app);
 const specs = swaggerJsdoc(swaggerOptions);

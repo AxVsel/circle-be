@@ -71,7 +71,6 @@ export async function handleCreateThread(req: Request, res: Response) {
       .json({ message: "Server error saat membuat thread" });
   }
 }
-
 // controller.ts
 export async function handleGetAllThreads(req: Request, res: Response) {
   try {
